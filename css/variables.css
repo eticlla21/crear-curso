@@ -1,0 +1,6 @@
+:root{
+--primary:#2563eb;--primary-dark:#1e40af;--secondary:#7c3aed;
+--success:#10b981;--warning:#f59e0b;--danger:#ef4444;
+--bg:#f5f7fb;--card:#ffffff;--text:#1f2937;--border:#e5e7eb;
+--radius:16px;--shadow:0 4px 12px rgba(0,0,0,.08);
+}

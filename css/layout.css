@@ -1,0 +1,1 @@
+body{background:var(--bg);color:var(--text)}.app{display:grid;grid-template-columns:320px 1fr;min-height:100vh}.main{padding:24px;overflow:auto}.topbar{background:#fff;padding:20px;border-bottom:1px solid var(--border)}
