@@ -1,8 +1,0 @@
-
-body{font-family:Segoe UI,sans-serif;margin:0;background:#f5f7fb}
-.top{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:16px}
-.layout{display:grid;grid-template-columns:260px 1fr}
-.sidebar{background:#fff;padding:15px;display:flex;flex-direction:column;gap:10px;height:100vh}
-.sidebar button{padding:10px;border:0;border-radius:10px;background:#eef2ff}
-main{padding:20px}
-#preview{background:#fff;border-radius:12px;padding:20px;min-height:300px}
