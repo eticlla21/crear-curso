@@ -1,0 +1,1 @@
+function uid(){return Math.random().toString(36).slice(2,10);}function escapeHtml(s){return s.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}

@@ -1,0 +1,1 @@
+function updatePreview(course){const p=document.getElementById('preview');if(!p)return;p.innerHTML=`<h1>${course.title||'Curso'}</h1>`;}

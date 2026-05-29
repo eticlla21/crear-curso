@@ -1,0 +1,1 @@
+let modules=[];function addModule(data){modules.push(data);renderModules();}function removeModule(i){modules.splice(i,1);renderModules();}function renderModules(){console.log('render',modules);}

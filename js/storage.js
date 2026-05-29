@@ -1,0 +1,1 @@
+function saveProject(data){localStorage.setItem('lms_project',JSON.stringify(data));}function loadProject(){return JSON.parse(localStorage.getItem('lms_project')||'{}');}

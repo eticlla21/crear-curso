@@ -1,0 +1,1 @@
+function exportCourse(course){return `<div id="curso-lms"><h1>${course.title}</h1></div>`;}function downloadHTML(html){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='curso.html';a.click();}
