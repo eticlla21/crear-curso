@@ -1,836 +1,617 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+<!doctype html>
+<html lang="es" class="h-full">
+ <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Cursos para Blogger</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      background-attachment: fixed;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    .module-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .module-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    }
-    .progress-bar {
-      transition: width 0.5s ease;
-    }
-    .content-section {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    .content-section.hidden {
-      opacity: 0;
-      transform: translateX(20px);
-      position: absolute;
-    }
-    .content-section.visible {
-      opacity: 1;
-      transform: translateX(0);
-      position: relative;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease-out;
-    }
+    * { font-family: 'DM Sans', sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .gradient-header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
+    .module-card { transition: all 0.2s ease; }
+    .module-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    #output-code { white-space: pre-wrap; word-break: break-all; font-family: 'Courier New', monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
   </style>
-</head>
-<body class="min-h-screen">
-  <!-- ==================== CONSTRUCTOR (Formulario) ==================== -->
-  <div id="constructor" class="min-h-screen p-4 sm:p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto">
-      <!-- Header -->
-      <header class="glass rounded-2xl p-6 mb-8 shadow-xl">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
-              Generador de Cursos para Blogger
-            </h1>
-            <p class="text-gray-600 mt-1">Crea cursos profesionales sin código</p>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">v1.0</span>
-            <button onclick="togglePreview()" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
-              Vista Previa
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <!-- Formulario Principal -->
-      <div class="glass rounded-2xl p-6 sm:p-8 shadow-xl">
-        
-        <!-- Datos Generales -->
-        <section class="mb-10">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Datos Generales del Curso</h2>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Título del Curso *</label>
-              <input id="courseTitle" type="text" placeholder="Ej: Curso Completo de Marketing Digital"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Subtítulo</label>
-              <input id="courseSubtitle" type="text" placeholder="Ej: Aprende desde cero a experto"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Instructor *</label>
-              <input id="instructor" type="text" placeholder="Ej: Juan Pérez, PhD"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Imagen Principal</label>
-              <input id="courseImage" type="url" placeholder="https://ejemplo.com/imagen.jpg"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-            </div>
-          </div>
-        </section>
-
-        <!-- Sección de Módulos -->
-        <section class="mb-10">
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
-              </div>
-              <h2 class="text-xl font-bold text-gray-800">Módulos del Curso</h2>
-            </div>
-            <button onclick="addModule()" class="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              Agregar Módulo
-            </button>
-          </div>
-          
-          <div id="modulesContainer" class="space-y-6">
-            <!-- Los módulos se agregarán aquí dinámicamente -->
-          </div>
-        </section>
-
-        <!-- Evaluación Final -->
-        <section class="mb-10">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-              </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800">Evaluación Final</h2>
-          </div>
-          
-          <div class="grid grid-cols-1 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Google Forms *</label>
-              <input id="finalExam" type="url" placeholder="https://docs.google.com/forms/..."
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
-            </div>
-          </div>
-        </section>
-
-        <!-- Botón de Generación -->
-        <div class="flex justify-end">
-          <button onclick="generateAndDownload()" 
-                  class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-bold text-lg flex items-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-            Generar y Descargar Código
-          </button>
-        </div>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full bg-slate-50">
+  <div id="app" class="h-full w-full overflow-auto">
+   <header class="gradient-header text-white py-5 px-6 shadow-lg">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center"><i data-lucide="graduation-cap" class="w-5 h-5"></i>
       </div>
-    </div>
-  </div>
-
-  <!-- ==================== PREVIEW (Opcional) ==================== -->
-  <div id="preview" class="hidden min-h-screen p-4 sm:p-6 lg:p-8">
-    <div class="max-w-7xl mx-auto">
-      <header class="glass rounded-2xl p-6 mb-8 shadow-xl">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Vista Previa del Curso</h1>
-            <p class="text-gray-600 mt-1">Visualiza antes de generar</p>
-          </div>
-          <button onclick="togglePreview()" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
-            Volver al Constructor
-          </button>
-        </div>
-      </header>
-      
-      <div id="previewContainer" class="glass rounded-2xl p-6 sm:p-8 shadow-xl min-h-[600px]">
-        <!-- El preview se generará aquí -->
+      <div>
+       <h1 id="main-title" class="text-xl font-bold">Generador de Cursos</h1>
+       <p class="text-slate-300 text-sm">Crea plantillas LMS profesionales para Blogger</p>
       </div>
+     </div><span class="text-xs bg-white/10 px-3 py-1 rounded-full">v2.0</span>
     </div>
+   </header>
+   <main class="max-w-6xl mx-auto p-6">
+    <div id="builder-section">
+     <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 fade-in">
+      <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-emerald-600"></i> Datos Generales del Curso</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+       <div><label class="block text-sm font-medium text-slate-600 mb-1">Título del Curso *</label> <input type="text" id="course-title" placeholder="Ej: Marketing Digital Avanzado" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-1">Subtítulo</label> <input type="text" id="course-subtitle" placeholder="Ej: Domina las estrategias más efectivas" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-1">Instructor *</label> <input type="text" id="course-instructor" placeholder="Ej: Prof. María García" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+       </div>
+       <div><label class="block text-sm font-medium text-slate-600 mb-1">URL Imagen Principal</label> <input type="url" id="course-image" placeholder="https://..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" onchange="previewImage()" oninput="previewImage()">
+       </div>
+      </div>
+      <div id="image-preview-container" class="hidden mt-4 pt-4 border-t border-slate-200"><label class="block text-sm font-medium text-slate-600 mb-2">Vista Previa</label> <img id="image-preview" src="" alt="Previa" class="max-w-sm rounded-xl shadow-md border border-slate-200">
+      </div>
+     </section>
+    </div>
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 fade-in">
+     <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2"><i data-lucide="layers" class="w-5 h-5 text-emerald-600"></i> Módulos del Curso</h2><button onclick="addModule()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition"> <i data-lucide="plus" class="w-4 h-4"></i> Agregar Módulo </button>
+     </div>
+     <div id="modules-container"></div>
+     <p id="no-modules" class="text-center text-slate-400 py-8">Aún no hay módulos. Haz clic en "Agregar Módulo" para comenzar.</p>
+    </section>
+    <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 fade-in">
+     <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i> Evaluación Final</h2>
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-600 mb-1">Descripción de la Evaluación</label> <textarea id="course-eval-desc" placeholder="Ej: Completa este formulario para demostrar que has asimilado los conceptos principales del curso." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" rows="3"></textarea>
+      </div>
+      <div class="md:col-span-2"><label class="block text-sm font-medium text-slate-600 mb-1">URL de Google Forms</label> <input type="url" id="course-evaluation" placeholder="https://docs.google.com/forms/..." class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition">
+      </div>
+     </div>
+    </section>
+    <div class="text-center mb-6"><button onclick="generateCode()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-4 rounded-2xl text-lg font-semibold shadow-lg shadow-emerald-200 transition transform hover:scale-[1.02]"> <span class="flex items-center gap-2"> <i data-lucide="code" class="w-5 h-5"></i> Generar Código para Blogger </span> </button>
+    </div>
+   </main>
   </div>
-
-  <!-- ==================== SCRIPTS ==================== -->
+  <div id="output-section" class="hidden fade-in">
+   <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+     <h2 class="text-lg font-semibold text-slate-800 flex items-center gap-2"><i data-lucide="file-code" class="w-5 h-5 text-emerald-600"></i> Código HTML Generado</h2>
+     <div class="flex gap-2"><button onclick="copyCode()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-medium transition"> <i data-lucide="copy" class="w-4 h-4"></i> Copiar </button> <button onclick="downloadCode()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition"> <i data-lucide="download" class="w-4 h-4"></i> Descargar </button> <button onclick="backToBuilder()" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition"> <i data-lucide="arrow-left" class="w-4 h-4"></i> Volver </button>
+     </div>
+    </div>
+    <div id="copy-toast" class="hidden mb-3 bg-emerald-50 text-emerald-700 text-sm px-4 py-2 rounded-xl border border-emerald-200">
+     ✓ Código copiado al portapapeles
+    </div>
+    <div class="bg-slate-900 rounded-xl p-4 overflow-hidden">
+     <pre id="output-code" class="text-emerald-400"></pre>
+    </div>
+   </div>
+  </div>
   <script>
-    // ==================== ESTADO DE LA APLICACIÓN ====================
-    let modules = [];
-    
-    // ==================== INICIALIZACIÓN ====================
-    document.addEventListener('DOMContentLoaded', () => {
-      // Agregar un módulo inicial
-      addModule();
+    let moduleCount = 0;
+
+    const defaultConfig = {
+      app_title: 'Generador de Cursos',
+      primary_color: '#059669',
+      background_color: '#f8fafc',
+      text_color: '#1e293b',
+      surface_color: '#ffffff',
+      accent_color: '#334155',
+      font_family: 'DM Sans',
+      font_size: 16
+    };
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        const t = document.getElementById('main-title');
+        if (t) t.textContent = config.app_title || defaultConfig.app_title;
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+          { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+          { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+          { get: () => config.primary_color || defaultConfig.primary_color, set: (v) => { config.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); } },
+          { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } }
+        ],
+        borderables: [],
+        fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); } },
+        fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); } }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['app_title', config.app_title || defaultConfig.app_title]
+      ])
     });
 
-    // ==================== FUNCIONES DEL CONSTRUCTOR ====================
-    
-    // Alternar entre Constructor y Preview
-    function togglePreview() {
-      const constructor = document.getElementById('constructor');
-      const preview = document.getElementById('preview');
-      
-      if (constructor.classList.contains('hidden')) {
-        constructor.classList.remove('hidden');
-        preview.classList.add('hidden');
-      } else {
-        // Generar preview antes de mostrar
-        generatePreview();
-        constructor.classList.add('hidden');
-        preview.classList.remove('hidden');
-      }
-    }
-
-    // Agregar un nuevo módulo
     function addModule() {
-      const container = document.getElementById('modulesContainer');
-      const moduleId = Date.now();
-      
-      const moduleHTML = `
-        <div class="module-card glass rounded-xl p-6 border border-gray-200" data-id="${moduleId}">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
-                ${modules.length + 1}
-              </span>
-              <h3 class="text-lg font-semibold text-gray-800">Módulo ${modules.length + 1}</h3>
-            </div>
-            <button onclick="removeModule(${moduleId})" 
-                    class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-            </button>
+      moduleCount++;
+      const container = document.getElementById('modules-container');
+      document.getElementById('no-modules').classList.add('hidden');
+      const div = document.createElement('div');
+      div.className = 'module-card bg-slate-50 border border-slate-200 rounded-xl p-5 mb-4';
+      div.id = `module-${moduleCount}`;
+      div.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">Módulo ${moduleCount}</span>
+          <button onclick="removeModule(${moduleCount})" class="text-red-400 hover:text-red-600 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">Título del Módulo *</label>
+            <input type="text" data-field="title" placeholder="Ej: Introducción" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
           </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Título del Módulo *</label>
-              <input type="text" placeholder="Ej: Introducción al Marketing"
-                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                     data-field="title">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-slate-500 mb-1">Descripción (con formato)</label>
+            <div class="border border-slate-200 rounded-lg overflow-hidden bg-white">
+              <div class="flex flex-wrap gap-1 bg-slate-50 p-2 border-b border-slate-200">
+                <button type="button" onclick="execCommand(this, 'bold')" title="Negrita" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-sm font-bold border border-slate-200 transition">B</button>
+                <button type="button" onclick="execCommand(this, 'italic')" title="Cursiva" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-sm italic border border-slate-200 transition">I</button>
+                <div class="w-px bg-slate-300"></div>
+                <button type="button" onclick="insertHeading(this, 'h1')" title="Encabezado 1" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-xs font-bold border border-slate-200 transition">H1</button>
+                <button type="button" onclick="insertHeading(this, 'h2')" title="Encabezado 2" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-xs font-bold border border-slate-200 transition">H2</button>
+                <button type="button" onclick="insertHeading(this, 'h3')" title="Encabezado 3" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-xs font-bold border border-slate-200 transition">H3</button>
+                <div class="w-px bg-slate-300"></div>
+                <button type="button" onclick="insertList(this, 'ul')" title="Lista" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-sm border border-slate-200 transition">• Lista</button>
+                <button type="button" onclick="insertList(this, 'ol')" title="Lista numerada" class="text-formatting-btn px-2.5 py-1.5 bg-white hover:bg-slate-200 rounded text-sm border border-slate-200 transition">1. Num</button>
+              </div>
+              <div data-field="desc" contenteditable="true" class="w-full px-3 py-2 min-h-24 max-h-40 overflow-y-auto text-sm focus:outline-none prose prose-sm max-w-none" style="word-wrap: break-word;"></div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Descripción Corta</label>
-              <input type="text" placeholder="Ej: Conceptos básicos y fundamentos"
-                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                     data-field="description">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Video (YouTube) *</label>
-              <input type="url" placeholder="https://youtube.com/embed/..."
-                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                     data-field="videoUrl">
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Documento PDF</label>
-              <input type="url" placeholder="https://ejemplo.com/documento.pdf"
-                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                     data-field="pdfUrl">
-            </div>
+            <p class="text-xs text-slate-400 mt-1">Usa los botones para dar formato al texto</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">ID o URL de YouTube</label>
+            <input type="text" data-field="video" placeholder="Ej: dQw4w9WgXcQ o URL completa" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-500 mb-1">URL de PDF</label>
+            <input type="url" data-field="pdf" placeholder="https://..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
           </div>
         </div>
       `;
-      
-      container.insertAdjacentHTML('beforeend', moduleHTML);
-      modules.push({ id: moduleId });
-      
-      // Renumerar módulos
-      renumberModules();
+      container.appendChild(div);
+      lucide.createIcons();
     }
 
-    // Eliminar un módulo
-    function removeModule(moduleId) {
-      if (modules.length <= 1) {
-        alert('Debe haber al menos un módulo');
+    function removeModule(id) {
+      const el = document.getElementById(`module-${id}`);
+      if (el) { el.remove(); }
+      if (document.getElementById('modules-container').children.length === 0) {
+        document.getElementById('no-modules').classList.remove('hidden');
+      }
+    }
+
+    function extractYouTubeId(input) {
+      if (!input) return '';
+      const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?\s]+)/);
+      if (match) return match[1];
+      if (/^[a-zA-Z0-9_-]{11}$/.test(input.trim())) return input.trim();
+      return input.trim();
+    }
+
+    function getModules() {
+      const modules = [];
+      document.querySelectorAll('[id^="module-"]').forEach(m => {
+        const title = m.querySelector('[data-field="title"]').value.trim();
+        const desc = m.querySelector('[data-field="desc"]').innerHTML.trim();
+        const video = m.querySelector('[data-field="video"]').value.trim();
+        const pdf = m.querySelector('[data-field="pdf"]').value.trim();
+        if (title) modules.push({ title, desc, video: extractYouTubeId(video), pdf });
+      });
+      return modules;
+    }
+
+    function execCommand(btn, cmd) {
+      const moduleCard = btn.closest('.module-card');
+      const editor = moduleCard.querySelector('[data-field="desc"]');
+      if (editor) {
+        editor.focus();
+        document.execCommand(cmd, false, null);
+        btn.style.background = document.queryCommandState(cmd) ? '#d1fae5' : 'white';
+      }
+    }
+
+    function insertHeading(btn, tag) {
+      const moduleCard = btn.closest('.module-card');
+      const editor = moduleCard.querySelector('[data-field="desc"]');
+      if (editor && editor.contentEditable) {
+        editor.focus();
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          let text = range.extractContents();
+          const heading = document.createElement(tag);
+          heading.appendChild(text);
+          range.insertNode(heading);
+          range.collapse(false);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }
+    }
+
+    function insertList(btn, type) {
+      const moduleCard = btn.closest('.module-card');
+      const editor = moduleCard.querySelector('[data-field="desc"]');
+      if (editor && editor.contentEditable) {
+        editor.focus();
+        document.execCommand('insert' + (type === 'ul' ? 'Unordered' : 'Ordered') + 'List', false, null);
+      }
+    }
+
+    function generateCode() {
+      const title = document.getElementById('course-title').value.trim();
+      const subtitle = document.getElementById('course-subtitle').value.trim();
+      const instructor = document.getElementById('course-instructor').value.trim();
+      const image = document.getElementById('course-image').value.trim();
+      const evaluation = document.getElementById('course-evaluation').value.trim();
+      const evalDesc = document.getElementById('course-eval-desc').value.trim();
+      const modules = getModules();
+
+      if (!title || !instructor || modules.length === 0) {
+        showInlineError('Por favor completa el título, instructor y al menos un módulo.');
         return;
       }
-      
-      const container = document.getElementById('modulesContainer');
-      const moduleElement = container.querySelector(`[data-id="${moduleId}"]`);
-      
-      if (moduleElement) {
-        moduleElement.remove();
-        modules = modules.filter(m => m.id !== moduleId);
-        renumberModules();
-      }
-    }
 
-    // Renumerar módulos
-    function renumberModules() {
-      const moduleElements = document.querySelectorAll('#modulesContainer .module-card');
-      moduleElements.forEach((el, index) => {
-        const numberSpan = el.querySelector('span');
-        if (numberSpan) {
-          numberSpan.textContent = index + 1;
-        }
-        const title = el.querySelector('h3');
-        if (title) {
-          title.textContent = `Módulo ${index + 1}`;
-        }
-      });
-    }
+      const modulesNav = modules.map((m, i) => `
+        <li>
+          <button onclick="showSection(${i})" id="nav-btn-${i}" class="nav-item" aria-current="page">
+            <span class="nav-icon" id="nav-icon-${i}">${i + 1}</span>
+            <span class="nav-label">${escHtml(m.title)}</span>
+          </button>
+        </li>`).join('');
 
-    // Obtener datos del formulario
-    function getFormData() {
-      const courseTitle = document.getElementById('courseTitle').value.trim();
-      const courseSubtitle = document.getElementById('courseSubtitle').value.trim();
-      const instructor = document.getElementById('instructor').value.trim();
-      const courseImage = document.getElementById('courseImage').value.trim();
-      const finalExam = document.getElementById('finalExam').value.trim();
-      
-      // Validar campos obligatorios
-      if (!courseTitle || !instructor || !finalExam) {
-        alert('Por favor complete los campos obligatorios (Título, Instructor y URL de Google Forms)');
-        return null;
-      }
-      
-      // Obtener módulos
-      const moduleElements = document.querySelectorAll('#modulesContainer .module-card');
-      const courseModules = [];
-      
-      for (let el of moduleElements) {
-        const title = el.querySelector('[data-field="title"]').value.trim();
-        const description = el.querySelector('[data-field="description"]').value.trim();
-        const videoUrl = el.querySelector('[data-field="videoUrl"]').value.trim();
-        const pdfUrl = el.querySelector('[data-field="pdfUrl"]').value.trim();
-        
-        if (!title || !videoUrl) {
-          alert('Todos los módulos deben tener un título y una URL de video de YouTube');
-          return null;
+      const modulesContent = modules.map((m, i) => {
+        let videoHtml = '';
+        if (m.video) {
+          videoHtml = `<div style="margin-bottom:var(--space-8);"><div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);"><iframe src="https://www.youtube.com/embed/${escHtml(m.video)}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allowfullscreen></iframe></div></div>`;
         }
-        
-        // Convertir URL de YouTube a embed
-        let embedUrl = videoUrl;
-        if (videoUrl.includes('youtube.com/watch?v=')) {
-          const videoId = videoUrl.split('v=')[1].split('&')[0];
-          embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
-        } else if (videoUrl.includes('youtu.be/')) {
-          const videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
-          embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        let pdfHtml = '';
+        if (m.pdf) {
+          pdfHtml = `<div style="margin-bottom:var(--space-8);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);"><iframe src="${escHtml(m.pdf)}" style="width:100%;height:500px;border:none;display:block;"></iframe></div><a href="${escHtml(m.pdf)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:var(--space-2);margin-top:var(--space-4);font-size:var(--text-sm);color:var(--color-primary);text-decoration:none;font-weight:500;">📄 Abrir PDF en nueva pestaña</a>`;
         }
-        
-        courseModules.push({
-          title,
-          description,
-          videoUrl: embedUrl,
-          pdfUrl
-        });
-      }
-      
-      return {
-        courseTitle,
-        courseSubtitle,
-        instructor,
-        courseImage: courseImage || 'https://via.placeholder.com/800x450?text=Curso+Profesional',
-        finalExam,
-        modules: courseModules
-      };
-    }
-
-    // ==================== GENERACIÓN DEL CÓDIGO ====================
-    
-    function generateCourseHTML(data) {
-      const modulesHTML = data.modules.map((module, index) => {
-        const isFirst = index === 0;
         return `
-          <div id="section-${index}" class="content-section ${isFirst ? 'visible' : 'hidden'}">
-            <div class="w-full max-w-4xl mx-auto">
-              <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <!-- Video -->
-                <div class="relative pb-[56.25%] bg-gray-100">
-                  <iframe 
-                    src="${module.videoUrl}" 
-                    class="absolute top-0 left-0 w-full h-full border-0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-                  </iframe>
-                </div>
-                
-                <!-- Contenido del módulo -->
-                <div class="p-8">
-                  <h2 class="text-2xl font-bold text-gray-800 mb-4">${module.title}</h2>
-                  ${module.description ? `<p class="text-gray-600 mb-6">${module.description}</p>` : ''}
-                  
-                  ${module.pdfUrl ? `
-                    <div class="mt-6">
-                      <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                        <svg class="w-6 h-6 text-red-500 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Material de Apoyo
-                      </h3>
-                      <div class="bg-gray-50 rounded-xl p-6">
-                        <iframe 
-                          src="${module.pdfUrl}" 
-                          class="w-full h-96 border-0" 
-                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-                        </iframe>
-                        <a href="${module.pdfUrl}" target="_blank" 
-                           class="hidden w-full block text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                          <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                          </svg>
-                          Descargar PDF
-                        </a>
-                      </div>
-                    </div>
-                  ` : ''}
-                </div>
-              </div>
-              
-              <!-- Navegación -->
-              <div class="flex justify-between mt-8 gap-4">
-                ${index > 0 ? `
-                  <button onclick="navigateTo(${index - 1})" 
-                          class="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    Anterior
-                  </button>
-                ` : '<div></div>'}
-                
-                ${index < data.modules.length - 1 ? `
-                  <button onclick="navigateTo(${index + 1})" 
-                          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2">
-                    Siguiente
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </button>
-                ` : ''}
-                
-                ${index === data.modules.length - 1 && data.finalExam ? `
-                  <button onclick="navigateTo(${data.modules.length})" 
-                          class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
-                    Ir a Evaluación Final
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                    </svg>
-                  </button>
-                ` : ''}
-              </div>
-            </div>
+        <div id="section-${i}" class="course-section" role="region" aria-labelledby="title-${i}">
+          <div class="section-header">
+            <h2 id="title-${i}">${escHtml(m.title)}</h2>
           </div>
-        `;
+          ${m.desc ? `<div class="section-body">${m.desc}</div>` : ''}
+          ${videoHtml}
+          ${pdfHtml}
+          <div class="section-footer">
+            <label class="complete-label">
+              <input type="checkbox" onchange="markComplete(${i})" id="check-${i}"> 
+              <span>Marcar como completado</span>
+            </label>
+            ${i < modules.length - 1 ? `<button class="btn-next" onclick="showSection(${i + 1})">Siguiente<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>` : (evaluation ? `<button class="btn-next" onclick="showSection('eval')">Evaluación<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>` : '')}
+          </div>
+        </div>`;
       }).join('');
 
-      // Sección de evaluación final
-      const examSection = data.finalExam ? `
-        <div id="section-${data.modules.length}" class="content-section hidden">
-          <div class="w-full max-w-4xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div class="p-8">
-                <div class="text-center mb-6">
-                  <h2 class="text-2xl font-bold text-gray-800 mb-2">Evaluación Final</h2>
-                  <p class="text-gray-600">Completa esta evaluación para obtener tu certificado</p>
-                </div>
-                
-                <div class="bg-gray-50 rounded-xl p-6 mb-6">
-                  <iframe 
-                    src="${data.finalExam}" 
-                    class="w-full h-[600px] border-0" 
-                    allowfullscreen>
-                  </iframe>
-                </div>
-                
-                <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
-                  <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Aviso Legal
-                  </h3>
-                  <p class="text-blue-700 text-sm leading-relaxed">
-                    Al completar esta evaluación, declaras que has revisado todo el material del curso. 
-                    La certificación es emitida automáticamente al aprobar con un mínimo del 70%. 
-                    Este certificado es válido para fines educativos y profesionales.
-                  </p>
-                </div>
-                
-                <div class="flex justify-end mt-6">
-                  <button onclick="navigateTo(${data.modules.length - 1})" 
-                          class="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    Volver al Último Módulo
-                  </button>
-                </div>
-              </div>
-            </div>
+      let evalSection = '';
+      if (evaluation) {
+        evalSection = `
+        <div id="section-eval" class="course-section" role="region" aria-labelledby="title-eval">
+          <div class="section-header">
+            <h2 id="title-eval">Evaluación Final</h2>
           </div>
-        </div>
-      ` : '';
-
-      // HTML completo del curso
-      return `
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${data.courseTitle} | ${data.instructor}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    .progress-bar {
-      transition: width 0.5s ease;
-    }
-    .content-section {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    .content-section.hidden {
-      opacity: 0;
-      transform: translateX(20px);
-      position: absolute;
-      width: 100%;
-    }
-    .content-section.visible {
-      opacity: 1;
-      transform: translateX(0);
-      position: relative;
-    }
-    @media (max-width: 768px) {
-      .content-section.hidden {
-        position: fixed;
-        top: 0;
-        left: 100%;
+          ${evalDesc ? `<div class="section-body"><p>${escHtml(evalDesc)}</p></div>` : ''}
+          <div class="eval-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Asegúrate de haber revisado todo el contenido antes de continuar. Al completar esta evaluación, tus respuestas serán registradas.</span>
+          </div>
+          <div class="eval-iframe-wrap">
+            <iframe src="${escHtml(evaluation)}" title="Evaluación Final" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>`;
       }
-    }
-  </style>
+
+      const totalSections = modules.length;
+
+      const outputHtml = `<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escHtml(title)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#f3f0ec;--color-border:oklch(0.2 0.01 80/0.12);
+  --color-divider:#dcd9d5;--color-text:#28251d;--color-text-muted:#7a7974;
+  --color-text-faint:#bab9b4;--color-primary:#01696f;--color-primary-hover:#0c4e54;
+  --color-primary-active:#0f3638;--color-primary-hl:oklch(0.75 0.05 192/0.18);
+  --color-success:#437a22;--color-success-hl:#d4dfcc;
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80/0.06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80/0.08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80/0.12);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;
+  --radius-full:9999px;--space-1:0.25rem;--space-2:0.5rem;--space-3:0.75rem;
+  --space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;
+  --space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+  --font-body:'Inter',system-ui,sans-serif;
+}
+[data-theme="dark"]{
+  --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a;--color-border:oklch(1 0 0/0.08);
+  --color-divider:#262523;--color-text:#cdccca;--color-text-muted:#797876;
+  --color-text-faint:#5a5957;--color-primary:#4f98a3;--color-primary-hover:#227f8b;
+  --color-primary-active:#1a626b;--color-primary-hl:oklch(0.45 0.07 192/0.25);
+  --color-success:#6daa45;--color-success-hl:#3a4435;
+  --shadow-sm:0 1px 2px oklch(0 0 0/0.2);--shadow-md:0 4px 12px oklch(0 0 0/0.3);
+  --shadow-lg:0 12px 32px oklch(0 0 0/0.4);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){
+  --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a;--color-border:oklch(1 0 0/0.08);
+  --color-divider:#262523;--color-text:#cdccca;--color-text-muted:#797876;
+  --color-text-faint:#5a5957;--color-primary:#4f98a3;--color-primary-hover:#227f8b;
+  --color-primary-active:#1a626b;--color-primary-hl:oklch(0.45 0.07 192/0.25);
+  --color-success:#6daa45;--color-success-hl:#3a4435;
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;font-size:16px;}
+body{font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg);line-height:1.6;min-height:100dvh;}
+img{display:block;max-width:100%;height:auto;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+a,button,[role="button"]{transition:color var(--transition),background var(--transition),border-color var(--transition),box-shadow var(--transition);}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm);}
+.lms-wrapper{font-family:var(--font-body);max-width:1200px;margin:0 auto;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-lg);}
+.lms-header{background:linear-gradient(in oklab 135deg,#1e293b,#0f3638);color:white;padding:var(--space-8) var(--space-8) var(--space-6);position:relative;}
+.lms-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-4);}
+.lms-header h1{font-size:var(--text-xl);font-weight:700;letter-spacing:-0.02em;line-height:1.2;margin-bottom:var(--space-1);}
+.lms-header .subtitle{opacity:0.75;font-size:var(--text-sm);margin-bottom:var(--space-1);}
+.lms-header .instructor{opacity:0.55;font-size:var(--text-xs);letter-spacing:0.03em;}
+.theme-toggle{background:oklch(1 0 0/0.1);border:1px solid oklch(1 0 0/0.2);border-radius:var(--radius-full);padding:var(--space-2);color:white;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--transition);}
+.theme-toggle:hover{background:oklch(1 0 0/0.18);}
+.lms-header-meta{display:flex;align-items:center;gap:var(--space-6);margin-top:var(--space-5);padding-top:var(--space-5);border-top:1px solid oklch(1 0 0/0.1);}
+.meta-stat{display:flex;flex-direction:column;gap:2px;}
+.meta-stat-label{font-size:var(--text-xs);opacity:0.55;text-transform:uppercase;letter-spacing:0.05em;}
+.meta-stat-value{font-size:var(--text-sm);font-weight:600;opacity:0.9;}
+.progress-wrap{flex:1;max-width:240px;}
+.progress-label{display:flex;justify-content:space-between;font-size:var(--text-xs);opacity:0.7;margin-bottom:var(--space-2);}
+.progress-bar{background:oklch(1 0 0/0.15);border-radius:var(--radius-full);height:6px;overflow:hidden;}
+.progress-fill{background:linear-gradient(90deg,#34d399,#10b981);height:100%;border-radius:var(--radius-full);transition:width 0.5s cubic-bezier(0.16,1,0.3,1);width:0%;}
+.hamburger-btn{display:none;align-items:center;gap:var(--space-2);background:var(--color-primary);color:white;border:none;padding:var(--space-3) var(--space-4);border-radius:0;font-size:var(--text-sm);font-weight:500;width:100%;}
+.hamburger-btn svg{flex-shrink:0;}
+@media(max-width:768px){.hamburger-btn{display:flex;}}
+.lms-body{display:flex;min-height:520px;}
+.lms-sidebar{width:272px;flex-shrink:0;background:var(--color-surface-2);border-right:1px solid var(--color-divider);padding:var(--space-4) var(--space-3);overflow-y:auto;}
+.sidebar-section-label{font-size:var(--text-xs);font-weight:600;color:var(--color-text-faint);text-transform:uppercase;letter-spacing:0.07em;padding:var(--space-2) var(--space-3) var(--space-2);display:block;}
+.lms-sidebar ul{list-style:none;padding:0;margin:0 0 var(--space-4);}
+.lms-sidebar li{margin-bottom:2px;}
+.nav-item{display:flex;align-items:center;gap:var(--space-3);width:100%;text-align:left;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);border:none;cursor:pointer;background:transparent;color:var(--color-text-muted);transition:background var(--transition),color var(--transition);}
+.nav-item:hover{background:var(--color-primary-hl);color:var(--color-primary);}
+.nav-item.active{background:var(--color-primary-hl);color:var(--color-primary);font-weight:600;}
+.nav-icon{width:24px;height:24px;flex-shrink:0;border-radius:var(--radius-full);background:var(--color-surface-offset);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:var(--color-text-muted);transition:background var(--transition),color var(--transition);}
+.nav-item.active .nav-icon,.nav-item.completed .nav-icon{background:var(--color-primary);color:white;}
+.nav-item.completed .nav-icon{background:var(--color-success);}
+.nav-label{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lms-content{flex:1;padding:var(--space-8) var(--space-8);overflow-y:auto;background:var(--color-bg);}
+.course-section{display:none;animation:fadeIn 0.25s ease;}
+.course-section.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.section-header{margin-bottom:var(--space-6);}
+.section-header h2{font-size:var(--text-lg);font-weight:700;color:var(--color-text);line-height:1.2;margin-bottom:var(--space-2);}
+.section-body{color:var(--color-text-muted);line-height:1.75;font-size:var(--text-base);}
+.section-body p{margin-bottom:var(--space-4);max-width:72ch;}
+.section-body p:last-child{margin-bottom:0;}
+.section-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-4);margin-top:var(--space-8);padding-top:var(--space-5);border-top:1px solid var(--color-divider);}
+.complete-label{display:flex;align-items:center;gap:var(--space-2);cursor:pointer;font-size:var(--text-sm);color:var(--color-text-muted);user-select:none;}
+.complete-label input[type="checkbox"]{width:18px;height:18px;accent-color:var(--color-primary);cursor:pointer;border-radius:var(--radius-sm);}
+.complete-label:hover{color:var(--color-text);}
+.btn-next{display:inline-flex;align-items:center;gap:var(--space-2);background:var(--color-primary);color:white;padding:var(--space-2) var(--space-5);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:600;border:none;cursor:pointer;transition:background var(--transition),box-shadow var(--transition);}
+.btn-next:hover{background:var(--color-primary-hover);box-shadow:var(--shadow-md);}
+.btn-next:active{background:var(--color-primary-active);}
+.btn-next svg{width:16px;height:16px;flex-shrink:0;}
+.eval-notice{background:var(--color-success-hl);border:1px solid color-mix(in oklch,var(--color-success) 30%,transparent);border-radius:var(--radius-lg);padding:var(--space-4);font-size:var(--text-sm);color:var(--color-success);margin-bottom:var(--space-6);display:flex;align-items:flex-start;gap:var(--space-3);}
+.eval-notice svg{flex-shrink:0;margin-top:2px;}
+.eval-iframe-wrap{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--color-border);}
+.eval-iframe-wrap iframe{width:100%;height:600px;border:none;display:block;}
+.completion-badge{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:var(--space-12) var(--space-8);gap:var(--space-4);}
+.completion-badge.visible{display:flex;}
+.badge-icon{width:64px;height:64px;background:var(--color-success-hl);border-radius:var(--radius-full);display:flex;align-items:center;justify-content:center;}
+.badge-icon svg{color:var(--color-success);}
+.badge-title{font-size:var(--text-lg);font-weight:700;color:var(--color-text);}
+.badge-desc{font-size:var(--text-sm);color:var(--color-text-muted);max-width:36ch;}
+@media(max-width:768px){
+  .lms-body{flex-direction:column;}
+  .lms-sidebar{width:100%;max-height:0;overflow:hidden;padding:0;border-right:none;border-bottom:none;transition:max-height 0.3s ease,padding 0.3s ease;}
+  .lms-sidebar.open{max-height:600px;padding:var(--space-4) var(--space-3);border-bottom:1px solid var(--color-divider);}
+  .lms-content{padding:var(--space-6) var(--space-5);}
+  .lms-header{padding:var(--space-6) var(--space-5) var(--space-5);}
+  .lms-header-meta{flex-wrap:wrap;gap:var(--space-4);}
+  .progress-wrap{max-width:100%;flex:none;width:100%;}
+  .section-footer{flex-direction:column;align-items:flex-start;}
+}
+@media(max-width:480px){
+  .lms-wrapper{border-radius:0;border-left:none;border-right:none;}
+  .meta-stat:nth-child(3){display:none;}
+}
+</style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-  <div class="flex min-h-screen">
-    <!-- Menú Lateral (Escritorio) / Header (Móvil) -->
-    <nav class="hidden lg:block w-80 bg-white shadow-xl h-screen sticky top-0 overflow-y-auto">
-      <div class="p-6">
-        <!-- Header del curso -->
-        <div class="text-center mb-8 pb-6 border-b border-gray-200">
-          <img src="${data.courseImage}" alt="${data.courseTitle}" 
-               class="w-full h-40 object-cover rounded-xl mb-4" 
-               onerror="this.src='https://via.placeholder.com/800x450?text=${encodeURIComponent(data.courseTitle)}'">
-          <h1 class="text-xl font-bold text-gray-800">${data.courseTitle}</h1>
-          ${data.courseSubtitle ? `<p class="text-gray-600 text-sm mt-1">${data.courseSubtitle}</p>` : ''}
-          <p class="text-gray-500 text-sm mt-2">Instructor: ${data.instructor}</p>
-        </div>
-        
-        <!-- Lista de módulos -->
-        <div class="space-y-2">
-          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Contenido del Curso</h3>
-          
-          <div class="space-y-2" id="moduleList">
-            ${data.modules.map((module, index) => `
-              <button onclick="navigateTo(${index})" 
-                      class="module-item w-full text-left p-4 rounded-lg hover:bg-blue-50 transition-colors group" 
-                      data-index="${index}">
-                <div class="flex items-center gap-4">
-                  <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    ${index + 1}
-                  </div>
-                  <div class="flex-1">
-                    <h4 class="font-medium text-gray-800 group-hover:text-blue-600">${module.title}</h4>
-                    ${module.description ? `<p class="text-sm text-gray-500">${module.description}</p>` : ''}
-                  </div>
-                  <div class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-blue-500 transition-colors">
-                    <input type="checkbox" 
-                           onchange="toggleModuleComplete(${index})" 
-                           class="w-4 h-4 text-blue-600 rounded focus:ring-0">
-                  </div>
-                </div>
-              </button>
-            `).join('')}
-            
-            ${data.finalExam ? `
-              <button onclick="navigateTo(${data.modules.length})" 
-                      class="module-item w-full text-left p-4 rounded-lg hover:bg-green-50 transition-colors group" 
-                      data-index="${data.modules.length}">
-                <div class="flex items-center gap-4">
-                  <div class="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm group-hover:bg-green-600 group-hover:text-white transition-colors">
-                    ${data.modules.length + 1}
-                  </div>
-                  <div class="flex-1">
-                    <h4 class="font-medium text-gray-800 group-hover:text-green-600">Evaluación Final</h4>
-                    <p class="text-sm text-gray-500">Certificación del curso</p>
-                  </div>
-                  <div class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-green-500 transition-colors">
-                    <input type="checkbox" 
-                           onchange="toggleModuleComplete(${data.modules.length})" 
-                           class="w-4 h-4 text-green-600 rounded focus:ring-0">
-                  </div>
-                </div>
-              </button>
-            ` : ''}
-          </div>
-        </div>
-        
-        <!-- Barra de progreso -->
-        <div class="mt-8 pt-6 border-t border-gray-200">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-600">Progreso</span>
-            <span id="progressPercentage" class="text-sm font-bold text-blue-600">0%</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style="width: 0%;"></div>
-          </div>
-        </div>
+<body>
+<div class="lms-wrapper">
+  <div class="lms-header">
+    <div class="lms-header-top">
+      <div class="lms-title-group">
+        <h1>${escHtml(title)}</h1>
+        ${subtitle ? `<p class="subtitle">${escHtml(subtitle)}</p>` : ''}
+        <p class="instructor">Instructor: ${escHtml(instructor)}</p>
       </div>
-    </nav>
-
-    <!-- Header para Móvil -->
-    <header class="lg:hidden bg-white shadow-sm sticky top-0 z-50">
-      <div class="flex items-center justify-between p-4">
-        <button onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-        <h1 class="text-lg font-bold text-gray-800 truncate">${data.courseTitle}</h1>
-        <div class="w-10"></div>
+      <button class="theme-toggle" aria-label="Cambiar tema" data-theme-toggle>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+    <div class="lms-header-meta">
+      <div class="meta-stat">
+        <span class="meta-stat-label">Lecciones</span>
+        <span class="meta-stat-value" id="total-lessons">${totalSections}</span>
       </div>
-    </header>
-
-    <!-- Menú Móvil -->
-    <div id="mobileMenu" class="hidden lg:hidden fixed inset-0 bg-white z-40 overflow-y-auto">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-xl font-bold text-gray-800">Contenido</h2>
-          <button onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="space-y-2" id="mobileModuleList">
-          ${data.modules.map((module, index) => `
-            <button onclick="navigateTo(${index}); toggleMobileMenu();" 
-                    class="module-item w-full text-left p-4 rounded-lg hover:bg-blue-50 transition-colors group" 
-                    data-index="${index}">
-              <div class="flex items-center gap-4">
-                <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
-                  ${index + 1}
-                </div>
-                <div class="flex-1">
-                  <h4 class="font-medium text-gray-800">${module.title}</h4>
-                  ${module.description ? `<p class="text-sm text-gray-500">${module.description}</p>` : ''}
-                </div>
-              </div>
-            </button>
-          `).join('')}
-          
-          ${data.finalExam ? `
-            <button onclick="navigateTo(${data.modules.length}); toggleMobileMenu();" 
-                    class="module-item w-full text-left p-4 rounded-lg hover:bg-green-50 transition-colors group" 
-                    data-index="${data.modules.length}">
-              <div class="flex items-center gap-4">
-                <div class="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm">
-                  ${data.modules.length + 1}
-                </div>
-                <div class="flex-1">
-                  <h4 class="font-medium text-gray-800">Evaluación Final</h4>
-                  <p class="text-sm text-gray-500">Certificación</p>
-                </div>
-              </div>
-            </button>
-          ` : ''}
-        </div>
-        
-        <div class="mt-8 pt-6 border-t border-gray-200">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-sm font-medium text-gray-600">Progreso</span>
-            <span id="mobileProgressPercentage" class="text-sm font-bold text-blue-600">0%</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="mobileProgressBar" class="progress-bar bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style="width: 0%;"></div>
-          </div>
-        </div>
+      <div class="meta-stat">
+        <span class="meta-stat-label">Completadas</span>
+        <span class="meta-stat-value" id="done-lessons">0</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Progreso</span><span id="progress-text">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
       </div>
     </div>
-
-    <!-- Contenido Principal -->
-    <main class="flex-1 overflow-y-auto">
-      <div class="p-4 sm:p-6 lg:p-8">
-        ${modulesHTML}
-        ${examSection}
+  </div>
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Abrir menú del curso">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <span>Contenido del curso</span>
+  </button>
+  <div class="lms-body">
+    <nav class="lms-sidebar" id="lms-sidebar" aria-label="Navegación del curso">
+      <span class="sidebar-section-label">Módulos</span>
+      <ul id="nav-list">
+        ${modulesNav}
+        ${evaluation ? `<li><button onclick="showSection('eval')" id="nav-btn-eval" class="nav-item"><span class="nav-icon" id="nav-icon-eval"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span><span class="nav-label">Evaluación Final</span></button></li>` : ''}
+      </ul>
+    </nav>
+    <main class="lms-content" id="lms-main">
+      ${modulesContent}
+      ${evalSection}
+      <div id="section-complete" class="completion-badge" role="region" aria-label="Curso completado">
+        <div class="badge-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <p class="badge-title">¡Curso completado!</p>
+        <p class="badge-desc">Has terminado todos los módulos. ¡Excelente trabajo!</p>
       </div>
     </main>
   </div>
+</div>
+<script>
+(function(){
+  'use strict';
+  var TOTAL = ${totalSections};
+  var completed = [];
+  var html = document.documentElement;
+  var toggleBtn = document.querySelector('[data-theme-toggle]');
+  var isDark = (localStorage.getItem('lms-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light')) === 'dark';
+  applyTheme(isDark);
+  if(toggleBtn) toggleBtn.addEventListener('click', function(){isDark=!isDark;applyTheme(isDark);});
+  function applyTheme(dark){
+    html.setAttribute('data-theme', dark ? 'dark' : 'light');
+    try{localStorage.setItem('lms-theme', dark?'dark':'light');}catch(e){}
+    if(toggleBtn) toggleBtn.innerHTML = dark
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  function showSection(idx){
+    document.querySelectorAll('.course-section,.completion-badge').forEach(function(s){s.classList.remove('visible');});
+    var sec = document.getElementById('section-'+idx);
+    if(sec) sec.classList.add('visible');
+    document.querySelectorAll('.nav-item').forEach(function(b){b.classList.remove('active');b.removeAttribute('aria-current');});
+    var btn = document.getElementById('nav-btn-'+idx);
+    if(btn){btn.classList.add('active');btn.setAttribute('aria-current','page');}
+    if(window.innerWidth < 769){document.getElementById('lms-sidebar').classList.remove('open');}
+    var main = document.getElementById('lms-main');
+    if(main) main.scrollTop = 0;
+  }
+  function markComplete(idx){
+    if(completed.indexOf(idx) === -1) completed.push(idx);
+    var pct = Math.round((completed.length / TOTAL) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = pct + '%';
+    document.getElementById('done-lessons').textContent = completed.length;
+    var icon = document.getElementById('nav-icon-'+idx);
+    if(icon){
+      icon.style.background = 'var(--color-success)';
+      icon.style.color = 'white';
+      icon.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    }
+    var navBtn = document.getElementById('nav-btn-'+idx);
+    if(navBtn) navBtn.classList.add('completed');
+    if(completed.length >= TOTAL){
+      setTimeout(function(){
+        document.querySelectorAll('.course-section').forEach(function(s){s.classList.remove('visible');});
+        var cb = document.getElementById('section-complete');
+        if(cb) cb.classList.add('visible');
+      }, 800);
+    }
+  }
+  window.toggleSidebar = function(){
+    document.getElementById('lms-sidebar').classList.toggle('open');
+  };
+  window.showSection = showSection;
+  window.markComplete = markComplete;
+  showSection(0);
+})();
+<\/script>
+</body>
+</html>`;
 
-  <script>
-    // Estado del curso
-    let currentSection = 0;
-    let completedModules = new Set();
-    const totalSections = ${data.modules.length + (data.finalExam ? 1 : 0)};
-
-    // Navegar a una sección
-    function navigateTo(index) {
-      // Validar índice
-      if (index < 0 || index >= totalSections) return;
-
-      // Ocultar sección actual
-      const currentSectionEl = document.getElementById(`section-\${currentSection}`);
-      if (currentSectionEl) {
-        currentSectionEl.classList.remove('visible');
-        currentSectionEl.classList.add('hidden');
-      }
-
-      // Mostrar nueva sección
-      const newSectionEl = document.getElementById(`section-\${index}`);
-      if (newSectionEl) {
-        newSectionEl.classList.remove('hidden');
-        newSectionEl.classList.add('visible');
-      }
-
-      // Actualizar sección actual
-      currentSection = index;
-
-      // Actualizar estilos de navegación
-      updateNavigationStyles();
+      document.getElementById('output-code').textContent = outputHtml;
+      document.getElementById('builder-section').classList.add('hidden');
+      document.getElementById('output-section').classList.remove('hidden');
+      window.scrollTo(0, 0);
     }
 
-    // Actualizar estilos de navegación
-    function updateNavigationStyles() {
-      const moduleItems = document.querySelectorAll('.module-item');
-      moduleItems.forEach(item => {
-        const itemIndex = parseInt(item.dataset.index);
-        if (itemIndex === currentSection) {
-          item.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
-          item.classList.remove('hover:bg-blue-50');
-        } else {
-          item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
-          item.classList.add('hover:bg-blue-50');
-        }
+    function escHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function copyCode() {
+      const code = document.getElementById('output-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 2500);
       });
     }
 
-    // Marcar módulo como completado
-    function toggleModuleComplete(index) {
-      if (completedModules.has(index)) {
-        completedModules.delete(index);
-      } else {
-        completedModules.add(index);
-      }
-      updateProgress();
-    }
-
-    // Actualizar barra de progreso
-    function updateProgress() {
-      const progress = (completedModules.size / totalSections) * 100;
-      
-      // Actualizar barra de progreso
-      const progressBar = document.getElementById('progressBar');
-      const mobileProgressBar = document.getElementById('mobileProgressBar');
-      if (progressBar) progressBar.style.width = progress + '%';
-      if (mobileProgressBar) mobileProgressBar.style.width = progress + '%';
-      
-      // Actualizar porcentaje
-      const progressPercentage = document.getElementById('progressPercentage');
-      const mobileProgressPercentage = document.getElementById('mobileProgressPercentage');
-      if (progressPercentage) progressPercentage.textContent = Math.round(progress) + '%';
-      if (mobileProgressPercentage) mobileProgressPercentage.textContent = Math.round(progress) + '%';
-    }
-
-    // Alternar menú móvil
-    function toggleMobileMenu() {
-      const mobileMenu = document.getElementById('mobileMenu');
-      mobileMenu.classList.toggle('hidden');
-    }
-
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', () => {
-      updateNavigationStyles();
-      updateProgress();
-    });
-  </script>
-</body>
-</html>
-      `;
-    }
-
-    // Generar preview
-    function generatePreview() {
-      const data = getFormData();
-      if (!data) return;
-      
-      const previewContainer = document.getElementById('previewContainer');
-      const html = generateCourseHTML(data);
-      
-      // Crear un iframe para el preview
-      previewContainer.innerHTML = `
-        <iframe srcdoc="${encodeURIComponent(html)}" 
-                class="w-full h-[700px] border-0 rounded-xl" 
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
-        </iframe>
-      `;
-    }
-
-    // Generar y descargar código
-    function generateAndDownload() {
-      const data = getFormData();
-      if (!data) return;
-      
-      const html = generateCourseHTML(data);
-      
-      // Crear blob y descargar
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      
+    function downloadCode() {
+      const code = document.getElementById('output-code').textContent;
+      const blob = new Blob([code], { type: 'text/html' });
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.courseTitle.replace(/\s+/g, '-').toLowerCase()}-curso.html`;
-      document.body.appendChild(a);
+      a.href = URL.createObjectURL(blob);
+      a.download = 'curso-blogger.html';
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      // Mostrar mensaje de éxito
-      alert('¡Código generado y descargado correctamente! Puedes copiar el contenido del archivo y pegarlo en Blogger.');
+      URL.revokeObjectURL(a.href);
     }
+
+    function backToBuilder() {
+      document.getElementById('output-section').classList.add('hidden');
+      document.getElementById('builder-section').classList.remove('hidden');
+    }
+
+    function showInlineError(msg) {
+      let el = document.getElementById('inline-error');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'inline-error';
+        el.className = 'bg-red-50 text-red-700 text-sm px-4 py-3 rounded-xl border border-red-200 mb-4 text-center';
+        document.getElementById('builder-section').prepend(el);
+      }
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 4000);
+    }
+
+    function previewImage() {
+      const url = document.getElementById('course-image').value.trim();
+      const container = document.getElementById('image-preview-container');
+      const preview = document.getElementById('image-preview');
+      if (url) {
+        preview.src = url;
+        preview.onload = () => container.classList.remove('hidden');
+        preview.onerror = () => container.classList.add('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    lucide.createIcons();
   </script>
-</body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a03b7d7dff9a6d51',t:'MTc4MDEyMDUyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
