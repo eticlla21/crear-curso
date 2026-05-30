@@ -1,24 +1,836 @@
 <!DOCTYPE html>
-<html lang="es"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LMS Builder Blogger</title>
-<link rel="stylesheet" href="css/app.css">
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Cursos para Blogger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-attachment: fixed;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .module-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .module-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .progress-bar {
+      transition: width 0.5s ease;
+    }
+    .content-section {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .content-section.hidden {
+      opacity: 0;
+      transform: translateX(20px);
+      position: absolute;
+    }
+    .content-section.visible {
+      opacity: 1;
+      transform: translateX(0);
+      position: relative;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
 </head>
-<body>
-<header class="top"><h1>🎓 LMS Builder para Blogger</h1></header>
-<div class="layout">
-<nav class="sidebar">
-<button>📚 Curso</button>
-<button>📖 Contenido</button>
-<button>🎁 Recursos</button>
-<button>📝 Evaluación</button>
-<button>🚀 Generar</button>
-</nav>
-<main>
-<h2>Constructor Visual</h2>
-<p>Base inicial del proyecto.</p>
-<div id="preview">Vista previa LMS</div>
-</main>
-</div>
-<script src="js/app.js"></script>
-</body></html>
+<body class="min-h-screen">
+  <!-- ==================== CONSTRUCTOR (Formulario) ==================== -->
+  <div id="constructor" class="min-h-screen p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <header class="glass rounded-2xl p-6 mb-8 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">
+              Generador de Cursos para Blogger
+            </h1>
+            <p class="text-gray-600 mt-1">Crea cursos profesionales sin código</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">v1.0</span>
+            <button onclick="togglePreview()" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
+              Vista Previa
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Formulario Principal -->
+      <div class="glass rounded-2xl p-6 sm:p-8 shadow-xl">
+        
+        <!-- Datos Generales -->
+        <section class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Datos Generales del Curso</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Título del Curso *</label>
+              <input id="courseTitle" type="text" placeholder="Ej: Curso Completo de Marketing Digital"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Subtítulo</label>
+              <input id="courseSubtitle" type="text" placeholder="Ej: Aprende desde cero a experto"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Instructor *</label>
+              <input id="instructor" type="text" placeholder="Ej: Juan Pérez, PhD"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Imagen Principal</label>
+              <input id="courseImage" type="url" placeholder="https://ejemplo.com/imagen.jpg"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+          </div>
+        </section>
+
+        <!-- Sección de Módulos -->
+        <section class="mb-10">
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Módulos del Curso</h2>
+            </div>
+            <button onclick="addModule()" class="px-5 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Agregar Módulo
+            </button>
+          </div>
+          
+          <div id="modulesContainer" class="space-y-6">
+            <!-- Los módulos se agregarán aquí dinámicamente -->
+          </div>
+        </section>
+
+        <!-- Evaluación Final -->
+        <section class="mb-10">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Evaluación Final</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Google Forms *</label>
+              <input id="finalExam" type="url" placeholder="https://docs.google.com/forms/..."
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
+            </div>
+          </div>
+        </section>
+
+        <!-- Botón de Generación -->
+        <div class="flex justify-end">
+          <button onclick="generateAndDownload()" 
+                  class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-bold text-lg flex items-center gap-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            Generar y Descargar Código
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PREVIEW (Opcional) ==================== -->
+  <div id="preview" class="hidden min-h-screen p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+      <header class="glass rounded-2xl p-6 mb-8 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Vista Previa del Curso</h1>
+            <p class="text-gray-600 mt-1">Visualiza antes de generar</p>
+          </div>
+          <button onclick="togglePreview()" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium">
+            Volver al Constructor
+          </button>
+        </div>
+      </header>
+      
+      <div id="previewContainer" class="glass rounded-2xl p-6 sm:p-8 shadow-xl min-h-[600px]">
+        <!-- El preview se generará aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script>
+    // ==================== ESTADO DE LA APLICACIÓN ====================
+    let modules = [];
+    
+    // ==================== INICIALIZACIÓN ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Agregar un módulo inicial
+      addModule();
+    });
+
+    // ==================== FUNCIONES DEL CONSTRUCTOR ====================
+    
+    // Alternar entre Constructor y Preview
+    function togglePreview() {
+      const constructor = document.getElementById('constructor');
+      const preview = document.getElementById('preview');
+      
+      if (constructor.classList.contains('hidden')) {
+        constructor.classList.remove('hidden');
+        preview.classList.add('hidden');
+      } else {
+        // Generar preview antes de mostrar
+        generatePreview();
+        constructor.classList.add('hidden');
+        preview.classList.remove('hidden');
+      }
+    }
+
+    // Agregar un nuevo módulo
+    function addModule() {
+      const container = document.getElementById('modulesContainer');
+      const moduleId = Date.now();
+      
+      const moduleHTML = `
+        <div class="module-card glass rounded-xl p-6 border border-gray-200" data-id="${moduleId}">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+                ${modules.length + 1}
+              </span>
+              <h3 class="text-lg font-semibold text-gray-800">Módulo ${modules.length + 1}</h3>
+            </div>
+            <button onclick="removeModule(${moduleId})" 
+                    class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Título del Módulo *</label>
+              <input type="text" placeholder="Ej: Introducción al Marketing"
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                     data-field="title">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Descripción Corta</label>
+              <input type="text" placeholder="Ej: Conceptos básicos y fundamentos"
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                     data-field="description">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Video (YouTube) *</label>
+              <input type="url" placeholder="https://youtube.com/embed/..."
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                     data-field="videoUrl">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">URL de Documento PDF</label>
+              <input type="url" placeholder="https://ejemplo.com/documento.pdf"
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                     data-field="pdfUrl">
+            </div>
+          </div>
+        </div>
+      `;
+      
+      container.insertAdjacentHTML('beforeend', moduleHTML);
+      modules.push({ id: moduleId });
+      
+      // Renumerar módulos
+      renumberModules();
+    }
+
+    // Eliminar un módulo
+    function removeModule(moduleId) {
+      if (modules.length <= 1) {
+        alert('Debe haber al menos un módulo');
+        return;
+      }
+      
+      const container = document.getElementById('modulesContainer');
+      const moduleElement = container.querySelector(`[data-id="${moduleId}"]`);
+      
+      if (moduleElement) {
+        moduleElement.remove();
+        modules = modules.filter(m => m.id !== moduleId);
+        renumberModules();
+      }
+    }
+
+    // Renumerar módulos
+    function renumberModules() {
+      const moduleElements = document.querySelectorAll('#modulesContainer .module-card');
+      moduleElements.forEach((el, index) => {
+        const numberSpan = el.querySelector('span');
+        if (numberSpan) {
+          numberSpan.textContent = index + 1;
+        }
+        const title = el.querySelector('h3');
+        if (title) {
+          title.textContent = `Módulo ${index + 1}`;
+        }
+      });
+    }
+
+    // Obtener datos del formulario
+    function getFormData() {
+      const courseTitle = document.getElementById('courseTitle').value.trim();
+      const courseSubtitle = document.getElementById('courseSubtitle').value.trim();
+      const instructor = document.getElementById('instructor').value.trim();
+      const courseImage = document.getElementById('courseImage').value.trim();
+      const finalExam = document.getElementById('finalExam').value.trim();
+      
+      // Validar campos obligatorios
+      if (!courseTitle || !instructor || !finalExam) {
+        alert('Por favor complete los campos obligatorios (Título, Instructor y URL de Google Forms)');
+        return null;
+      }
+      
+      // Obtener módulos
+      const moduleElements = document.querySelectorAll('#modulesContainer .module-card');
+      const courseModules = [];
+      
+      for (let el of moduleElements) {
+        const title = el.querySelector('[data-field="title"]').value.trim();
+        const description = el.querySelector('[data-field="description"]').value.trim();
+        const videoUrl = el.querySelector('[data-field="videoUrl"]').value.trim();
+        const pdfUrl = el.querySelector('[data-field="pdfUrl"]').value.trim();
+        
+        if (!title || !videoUrl) {
+          alert('Todos los módulos deben tener un título y una URL de video de YouTube');
+          return null;
+        }
+        
+        // Convertir URL de YouTube a embed
+        let embedUrl = videoUrl;
+        if (videoUrl.includes('youtube.com/watch?v=')) {
+          const videoId = videoUrl.split('v=')[1].split('&')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        } else if (videoUrl.includes('youtu.be/')) {
+          const videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+          embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0`;
+        }
+        
+        courseModules.push({
+          title,
+          description,
+          videoUrl: embedUrl,
+          pdfUrl
+        });
+      }
+      
+      return {
+        courseTitle,
+        courseSubtitle,
+        instructor,
+        courseImage: courseImage || 'https://via.placeholder.com/800x450?text=Curso+Profesional',
+        finalExam,
+        modules: courseModules
+      };
+    }
+
+    // ==================== GENERACIÓN DEL CÓDIGO ====================
+    
+    function generateCourseHTML(data) {
+      const modulesHTML = data.modules.map((module, index) => {
+        const isFirst = index === 0;
+        return `
+          <div id="section-${index}" class="content-section ${isFirst ? 'visible' : 'hidden'}">
+            <div class="w-full max-w-4xl mx-auto">
+              <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <!-- Video -->
+                <div class="relative pb-[56.25%] bg-gray-100">
+                  <iframe 
+                    src="${module.videoUrl}" 
+                    class="absolute top-0 left-0 w-full h-full border-0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                  </iframe>
+                </div>
+                
+                <!-- Contenido del módulo -->
+                <div class="p-8">
+                  <h2 class="text-2xl font-bold text-gray-800 mb-4">${module.title}</h2>
+                  ${module.description ? `<p class="text-gray-600 mb-6">${module.description}</p>` : ''}
+                  
+                  ${module.pdfUrl ? `
+                    <div class="mt-6">
+                      <h3 class="text-lg font-semibold text-gray-800 mb-3">
+                        <svg class="w-6 h-6 text-red-500 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Material de Apoyo
+                      </h3>
+                      <div class="bg-gray-50 rounded-xl p-6">
+                        <iframe 
+                          src="${module.pdfUrl}" 
+                          class="w-full h-96 border-0" 
+                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                        </iframe>
+                        <a href="${module.pdfUrl}" target="_blank" 
+                           class="hidden w-full block text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                          <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                          </svg>
+                          Descargar PDF
+                        </a>
+                      </div>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              
+              <!-- Navegación -->
+              <div class="flex justify-between mt-8 gap-4">
+                ${index > 0 ? `
+                  <button onclick="navigateTo(${index - 1})" 
+                          class="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Anterior
+                  </button>
+                ` : '<div></div>'}
+                
+                ${index < data.modules.length - 1 ? `
+                  <button onclick="navigateTo(${index + 1})" 
+                          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2">
+                    Siguiente
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                ` : ''}
+                
+                ${index === data.modules.length - 1 && data.finalExam ? `
+                  <button onclick="navigateTo(${data.modules.length})" 
+                          class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2">
+                    Ir a Evaluación Final
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Sección de evaluación final
+      const examSection = data.finalExam ? `
+        <div id="section-${data.modules.length}" class="content-section hidden">
+          <div class="w-full max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div class="p-8">
+                <div class="text-center mb-6">
+                  <h2 class="text-2xl font-bold text-gray-800 mb-2">Evaluación Final</h2>
+                  <p class="text-gray-600">Completa esta evaluación para obtener tu certificado</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                  <iframe 
+                    src="${data.finalExam}" 
+                    class="w-full h-[600px] border-0" 
+                    allowfullscreen>
+                  </iframe>
+                </div>
+                
+                <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                  <h3 class="text-lg font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Aviso Legal
+                  </h3>
+                  <p class="text-blue-700 text-sm leading-relaxed">
+                    Al completar esta evaluación, declaras que has revisado todo el material del curso. 
+                    La certificación es emitida automáticamente al aprobar con un mínimo del 70%. 
+                    Este certificado es válido para fines educativos y profesionales.
+                  </p>
+                </div>
+                
+                <div class="flex justify-end mt-6">
+                  <button onclick="navigateTo(${data.modules.length - 1})" 
+                          class="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Volver al Último Módulo
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ` : '';
+
+      // HTML completo del curso
+      return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${data.courseTitle} | ${data.instructor}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .progress-bar {
+      transition: width 0.5s ease;
+    }
+    .content-section {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .content-section.hidden {
+      opacity: 0;
+      transform: translateX(20px);
+      position: absolute;
+      width: 100%;
+    }
+    .content-section.visible {
+      opacity: 1;
+      transform: translateX(0);
+      position: relative;
+    }
+    @media (max-width: 768px) {
+      .content-section.hidden {
+        position: fixed;
+        top: 0;
+        left: 100%;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="flex min-h-screen">
+    <!-- Menú Lateral (Escritorio) / Header (Móvil) -->
+    <nav class="hidden lg:block w-80 bg-white shadow-xl h-screen sticky top-0 overflow-y-auto">
+      <div class="p-6">
+        <!-- Header del curso -->
+        <div class="text-center mb-8 pb-6 border-b border-gray-200">
+          <img src="${data.courseImage}" alt="${data.courseTitle}" 
+               class="w-full h-40 object-cover rounded-xl mb-4" 
+               onerror="this.src='https://via.placeholder.com/800x450?text=${encodeURIComponent(data.courseTitle)}'">
+          <h1 class="text-xl font-bold text-gray-800">${data.courseTitle}</h1>
+          ${data.courseSubtitle ? `<p class="text-gray-600 text-sm mt-1">${data.courseSubtitle}</p>` : ''}
+          <p class="text-gray-500 text-sm mt-2">Instructor: ${data.instructor}</p>
+        </div>
+        
+        <!-- Lista de módulos -->
+        <div class="space-y-2">
+          <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Contenido del Curso</h3>
+          
+          <div class="space-y-2" id="moduleList">
+            ${data.modules.map((module, index) => `
+              <button onclick="navigateTo(${index})" 
+                      class="module-item w-full text-left p-4 rounded-lg hover:bg-blue-50 transition-colors group" 
+                      data-index="${index}">
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    ${index + 1}
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-medium text-gray-800 group-hover:text-blue-600">${module.title}</h4>
+                    ${module.description ? `<p class="text-sm text-gray-500">${module.description}</p>` : ''}
+                  </div>
+                  <div class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-blue-500 transition-colors">
+                    <input type="checkbox" 
+                           onchange="toggleModuleComplete(${index})" 
+                           class="w-4 h-4 text-blue-600 rounded focus:ring-0">
+                  </div>
+                </div>
+              </button>
+            `).join('')}
+            
+            ${data.finalExam ? `
+              <button onclick="navigateTo(${data.modules.length})" 
+                      class="module-item w-full text-left p-4 rounded-lg hover:bg-green-50 transition-colors group" 
+                      data-index="${data.modules.length}">
+                <div class="flex items-center gap-4">
+                  <div class="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm group-hover:bg-green-600 group-hover:text-white transition-colors">
+                    ${data.modules.length + 1}
+                  </div>
+                  <div class="flex-1">
+                    <h4 class="font-medium text-gray-800 group-hover:text-green-600">Evaluación Final</h4>
+                    <p class="text-sm text-gray-500">Certificación del curso</p>
+                  </div>
+                  <div class="w-6 h-6 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-green-500 transition-colors">
+                    <input type="checkbox" 
+                           onchange="toggleModuleComplete(${data.modules.length})" 
+                           class="w-4 h-4 text-green-600 rounded focus:ring-0">
+                  </div>
+                </div>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+        
+        <!-- Barra de progreso -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-600">Progreso</span>
+            <span id="progressPercentage" class="text-sm font-bold text-blue-600">0%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="progressBar" class="progress-bar bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header para Móvil -->
+    <header class="lg:hidden bg-white shadow-sm sticky top-0 z-50">
+      <div class="flex items-center justify-between p-4">
+        <button onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-lg font-bold text-gray-800 truncate">${data.courseTitle}</h1>
+        <div class="w-10"></div>
+      </div>
+    </header>
+
+    <!-- Menú Móvil -->
+    <div id="mobileMenu" class="hidden lg:hidden fixed inset-0 bg-white z-40 overflow-y-auto">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-800">Contenido</h2>
+          <button onclick="toggleMobileMenu()" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="space-y-2" id="mobileModuleList">
+          ${data.modules.map((module, index) => `
+            <button onclick="navigateTo(${index}); toggleMobileMenu();" 
+                    class="module-item w-full text-left p-4 rounded-lg hover:bg-blue-50 transition-colors group" 
+                    data-index="${index}">
+              <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-sm">
+                  ${index + 1}
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-medium text-gray-800">${module.title}</h4>
+                  ${module.description ? `<p class="text-sm text-gray-500">${module.description}</p>` : ''}
+                </div>
+              </div>
+            </button>
+          `).join('')}
+          
+          ${data.finalExam ? `
+            <button onclick="navigateTo(${data.modules.length}); toggleMobileMenu();" 
+                    class="module-item w-full text-left p-4 rounded-lg hover:bg-green-50 transition-colors group" 
+                    data-index="${data.modules.length}">
+              <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-bold text-sm">
+                  ${data.modules.length + 1}
+                </div>
+                <div class="flex-1">
+                  <h4 class="font-medium text-gray-800">Evaluación Final</h4>
+                  <p class="text-sm text-gray-500">Certificación</p>
+                </div>
+              </div>
+            </button>
+          ` : ''}
+        </div>
+        
+        <div class="mt-8 pt-6 border-t border-gray-200">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium text-gray-600">Progreso</span>
+            <span id="mobileProgressPercentage" class="text-sm font-bold text-blue-600">0%</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="mobileProgressBar" class="progress-bar bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="p-4 sm:p-6 lg:p-8">
+        ${modulesHTML}
+        ${examSection}
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Estado del curso
+    let currentSection = 0;
+    let completedModules = new Set();
+    const totalSections = ${data.modules.length + (data.finalExam ? 1 : 0)};
+
+    // Navegar a una sección
+    function navigateTo(index) {
+      // Validar índice
+      if (index < 0 || index >= totalSections) return;
+
+      // Ocultar sección actual
+      const currentSectionEl = document.getElementById(`section-\${currentSection}`);
+      if (currentSectionEl) {
+        currentSectionEl.classList.remove('visible');
+        currentSectionEl.classList.add('hidden');
+      }
+
+      // Mostrar nueva sección
+      const newSectionEl = document.getElementById(`section-\${index}`);
+      if (newSectionEl) {
+        newSectionEl.classList.remove('hidden');
+        newSectionEl.classList.add('visible');
+      }
+
+      // Actualizar sección actual
+      currentSection = index;
+
+      // Actualizar estilos de navegación
+      updateNavigationStyles();
+    }
+
+    // Actualizar estilos de navegación
+    function updateNavigationStyles() {
+      const moduleItems = document.querySelectorAll('.module-item');
+      moduleItems.forEach(item => {
+        const itemIndex = parseInt(item.dataset.index);
+        if (itemIndex === currentSection) {
+          item.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+          item.classList.remove('hover:bg-blue-50');
+        } else {
+          item.classList.remove('bg-blue-50', 'border-l-4', 'border-blue-500');
+          item.classList.add('hover:bg-blue-50');
+        }
+      });
+    }
+
+    // Marcar módulo como completado
+    function toggleModuleComplete(index) {
+      if (completedModules.has(index)) {
+        completedModules.delete(index);
+      } else {
+        completedModules.add(index);
+      }
+      updateProgress();
+    }
+
+    // Actualizar barra de progreso
+    function updateProgress() {
+      const progress = (completedModules.size / totalSections) * 100;
+      
+      // Actualizar barra de progreso
+      const progressBar = document.getElementById('progressBar');
+      const mobileProgressBar = document.getElementById('mobileProgressBar');
+      if (progressBar) progressBar.style.width = progress + '%';
+      if (mobileProgressBar) mobileProgressBar.style.width = progress + '%';
+      
+      // Actualizar porcentaje
+      const progressPercentage = document.getElementById('progressPercentage');
+      const mobileProgressPercentage = document.getElementById('mobileProgressPercentage');
+      if (progressPercentage) progressPercentage.textContent = Math.round(progress) + '%';
+      if (mobileProgressPercentage) mobileProgressPercentage.textContent = Math.round(progress) + '%';
+    }
+
+    // Alternar menú móvil
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', () => {
+      updateNavigationStyles();
+      updateProgress();
+    });
+  </script>
+</body>
+</html>
+      `;
+    }
+
+    // Generar preview
+    function generatePreview() {
+      const data = getFormData();
+      if (!data) return;
+      
+      const previewContainer = document.getElementById('previewContainer');
+      const html = generateCourseHTML(data);
+      
+      // Crear un iframe para el preview
+      previewContainer.innerHTML = `
+        <iframe srcdoc="${encodeURIComponent(html)}" 
+                class="w-full h-[700px] border-0 rounded-xl" 
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+        </iframe>
+      `;
+    }
+
+    // Generar y descargar código
+    function generateAndDownload() {
+      const data = getFormData();
+      if (!data) return;
+      
+      const html = generateCourseHTML(data);
+      
+      // Crear blob y descargar
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${data.courseTitle.replace(/\s+/g, '-').toLowerCase()}-curso.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      // Mostrar mensaje de éxito
+      alert('¡Código generado y descargado correctamente! Puedes copiar el contenido del archivo y pegarlo en Blogger.');
+    }
+  </script>
+</body>
+</html>
