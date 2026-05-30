@@ -1,1 +1,0 @@
-function applyTheme(theme){document.body.className=theme;}

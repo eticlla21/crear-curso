@@ -1,1 +1,0 @@
-const LMSBuilder={version:'1.0.0'};document.addEventListener('DOMContentLoaded',()=>console.log('LMS Builder iniciado'));
